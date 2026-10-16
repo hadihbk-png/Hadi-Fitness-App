@@ -6,10 +6,10 @@ Date: 16 October 2026
 
 | Suite | Tests | Passed | Failed |
 |---|---|---|---|
-| Backend / API tests (Vitest + Supertest), incl. streak & ring logic | 27 | 27 | 0 |
+| Backend / API tests (Vitest + Supertest), incl. streak & ring logic | 28 | 28 | 0 |
 | Frontend unit tests (Vitest) | 3 | 3 | 0 |
-| Browser tests (Playwright): 21 scenarios × 2 screens (desktop Chrome + iPhone 13 Mini, 375px) | 42 | 42 | 0 |
-| **Total** | **72** | **72** | **0** |
+| Browser tests (Playwright): 22 scenarios × 2 screens (desktop Chrome + iPhone 13 Mini, 375px) | 44 | 44 | 0 |
+| **Total** | **75** | **75** | **0** |
 
 - **One command runs everything:** `npm run test:all` (`npm test` = backend + unit, `npm run test:e2e` = browser).
 - `npm run build` completes with zero errors and zero warnings.
@@ -73,6 +73,8 @@ All tests run against a **throwaway in-memory Postgres** built from the same `db
 | 2 | **Ring captions and weekly bars could read over 100%** (e.g. "125% of 4 this week") after beating a goal. | The API caps these percentages at 0–100% and never returns NaN. The real counts (e.g. "5 of 4") are still shown. |
 | 3 | Found while testing the database step: **an impossible date (e.g. 2026-13-45) crashed the API** with a server error. | Dates are validated properly and rejected with a 400. |
 | 4 | Found while testing the database step: **every logged-out page load logged a "401" error** in the browser console from the login check. | The server also sets a harmless, non-secret `pf_logged_in` cookie, so the check is skipped when nobody is logged in. |
+| 5 | **The footer "Weekly programs" email box did nothing** when you pressed the arrow. | Emails are now saved (new `newsletter_subscribers` table and `/api/newsletter` route); you get a confirmation or a friendly error. Signing up twice is harmless. |
+| 6 | **Dashboard quotes rotated every 6 seconds with no way to pause** (WCAG 2.2.2). | Rotation pauses while the quote card is hovered or focused, and is off for people who've asked for reduced motion. The look is unchanged. |
 
 ## Lighthouse scores
 
@@ -97,7 +99,6 @@ Lighthouse suggests "text compression" only because the local preview server doe
    - sign up once, restart `npm run dev`, and confirm your data is still there
    - in Vercel, add `DATABASE_URL` and `JWT_SECRET` (the same value as in `.env`)
 2. **On a real iPhone in Safari.** The "iPhone" tests use Chrome at iPhone size.
-3. **The newsletter box in the footer does nothing yet.**
-4. **The phone picture in the landing hero is a sample illustration** ("Push Power", "21-day streak"), not real data.
-5. **Quotes on the Dashboard rotate every 6 seconds** with no pause button. This is a minor accessibility point and was left alone so the design doesn't change.
-6. **An old PulseFit dev server may still be running on port 5173**, from before the database was added. Close it so `npm run dev` gets http://localhost:5173.
+3. **The phone picture in the landing hero is a sample illustration** ("Push Power", "21-day streak"), not real data.
+4. **An old PulseFit dev server may still be running on port 5173**, from before the database was added. Close it so `npm run dev` gets http://localhost:5173.
+5. **Developer tools have moderate security warnings** (`npm audit`): Vite 5 and Vitest 2 have advisories that only affect the local dev server. The live site's packages have none (`npm audit --omit=dev` finds 0). Fixing them means major upgrades (Vite 8, Vitest 4), best done as a separate step.

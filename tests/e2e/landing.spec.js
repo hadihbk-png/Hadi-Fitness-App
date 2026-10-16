@@ -55,4 +55,13 @@ test.describe('Landing page (logged out)', () => {
     await page.locator('.class-card').first().getByRole('button', { name: /Book spot/ }).click()
     await expect(page).toHaveURL(/\/signup$/)
   })
+
+  test('footer "Weekly programs" sign-up saves the email and confirms', async ({ page }) => {
+    await page.goto('/')
+    const input = page.getByLabel('Email for weekly programs')
+    await input.fill(`news-${Date.now()}@test.pulsefit.dev`)
+    await page.getByRole('button', { name: 'Subscribe' }).click()
+    await expect(page.getByRole('status')).toContainText("You're in!")
+    await expect(input).toHaveValue('')
+  })
 })

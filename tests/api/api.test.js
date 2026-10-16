@@ -269,3 +269,17 @@ describe('progress rings', () => {
     expect(numbers).not.toContain('NaN')
   })
 })
+
+describe('newsletter', () => {
+  it('saves an email once, rejects bad emails', async () => {
+    const ok = await request(app).post('/api/newsletter').send({ email: ' News@PulseFit.com ' })
+    expect(ok.status).toBe(200)
+    expect(ok.body.message).toMatch(/You're in/)
+    expect((await request(app).post('/api/newsletter').send({ email: 'news@pulsefit.com' })).status).toBe(200)
+    const rows = await db.query(`SELECT email FROM newsletter_subscribers WHERE email = 'news@pulsefit.com'`)
+    expect(rows).toHaveLength(1)
+    expect((await request(app).post('/api/newsletter').send({ email: 'nope' })).status).toBe(400)
+    expect((await request(app).post('/api/newsletter').send({})).status).toBe(400)
+    await db.query(`DELETE FROM newsletter_subscribers WHERE email = 'news@pulsefit.com'`)
+  })
+})

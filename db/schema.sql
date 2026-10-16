@@ -81,3 +81,10 @@ CREATE TABLE IF NOT EXISTS class_bookings (
   PRIMARY KEY (user_id, class_id, week_start)
 );
 CREATE INDEX IF NOT EXISTS class_bookings_class_week_idx ON class_bookings (class_id, week_start);
+
+-- Footer "Weekly programs" sign-ups
+CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+  id         SERIAL PRIMARY KEY,
+  email      TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

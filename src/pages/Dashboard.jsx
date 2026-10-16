@@ -284,7 +284,10 @@ function ChartBars({ days, max }) {
 function MotivationSection({ data }) {
   const { week, streak, totals, completedToday } = data
   const [q, setQ] = useState(0)
-  useInterval(() => setQ((n) => (n + 1) % QUOTES.length), 6000)
+  // Auto-rotate, but pause while the card is hovered/focused and never for reduced-motion users (WCAG 2.2.2)
+  const [paused, setPaused] = useState(false)
+  const reducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  useInterval(() => setQ((n) => (n + 1) % QUOTES.length), paused || reducedMotion ? null : 6000)
   const trainedToday = completedToday.count > 0
 
   const goals = [
@@ -345,7 +348,14 @@ function MotivationSection({ data }) {
             </ul>
           </Reveal>
 
-          <Reveal delay={150} className="glass card quote-card">
+          <Reveal
+            delay={150}
+            className="glass card quote-card"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+            onFocus={() => setPaused(true)}
+            onBlur={() => setPaused(false)}
+          >
             <Quote size={36} className="quote-mark" />
             <blockquote key={q} className="swap-in">
               <p>{QUOTES[q].text}</p>

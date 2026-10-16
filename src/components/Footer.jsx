@@ -1,8 +1,29 @@
-import { ArrowRight, Play } from 'lucide-react'
+import { useState } from 'react'
+import { ArrowRight, Loader2, Play } from 'lucide-react'
 import { Logo, Reveal } from './ui'
 import { Link } from '../lib/router'
+import { api } from '../lib/api'
+import { useToast } from '../lib/toast'
 
 export default function Footer({ onStart }) {
+  const toast = useToast()
+  const [email, setEmail] = useState('')
+  const [sending, setSending] = useState(false)
+
+  const subscribe = async (e) => {
+    e.preventDefault()
+    setSending(true)
+    try {
+      const res = await api('/api/newsletter', { method: 'POST', body: { email } })
+      toast(res.message)
+      setEmail('')
+    } catch (err) {
+      toast(err.message, 'error')
+    } finally {
+      setSending(false)
+    }
+  }
+
   return (
     <footer className="footer">
       <div className="container">
@@ -33,11 +54,20 @@ export default function Footer({ onStart }) {
             <Link to="/dashboard#motivation">Badges</Link>
             <Link to="/dashboard#motivation">Streaks</Link>
           </div>
-          <form className="footer-news" onSubmit={(e) => e.preventDefault()}>
+          <form className="footer-news" onSubmit={subscribe} noValidate>
             <h3>Weekly programs</h3>
             <div className="news-input">
-              <input type="email" placeholder="you@email.com" aria-label="Email" />
-              <button className="icon-btn icon-btn-lime" aria-label="Subscribe"><ArrowRight size={18} /></button>
+              <input
+                type="email"
+                placeholder="you@email.com"
+                aria-label="Email for weekly programs"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <button className="icon-btn icon-btn-lime" aria-label="Subscribe" disabled={sending}>
+                {sending ? <Loader2 size={18} className="spin" /> : <ArrowRight size={18} />}
+              </button>
             </div>
           </form>
         </div>
