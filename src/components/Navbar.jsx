@@ -57,9 +57,12 @@ export default function Navbar({ onStart, onLogout }) {
           <div className="nav-actions">
             {user && (
               <>
-                <Link to="/dashboard" className="user-chip" aria-label={`Signed in as ${user.fullName}`}>
-                  <span className="avatar">{initials(user.fullName)}</span>
-                  <span className="user-name">{firstName(user)}</span>
+                <Link to="/dashboard" className="user-chip" title={`Signed in as ${user.fullName}`}>
+                  <span className="avatar" aria-hidden="true">{initials(user.fullName)}</span>
+                  <span className="user-name">
+                    <span className="sr-only">Signed in as </span>
+                    {firstName(user)}
+                  </span>
                 </Link>
                 <button className="icon-btn" onClick={onLogout} aria-label="Log out" title="Log out">
                   <LogOut size={16} />

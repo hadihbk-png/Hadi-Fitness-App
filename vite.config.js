@@ -9,9 +9,13 @@ export default defineConfig({
     // /api/* is served by the local Express server (server/dev-api.js), which loads the same /api files Vercel uses
     proxy: { '/api': `http://localhost:${API_PORT}` },
   },
+  // Same proxy for `vite preview` (used by the browser tests against the production build)
+  preview: {
+    proxy: { '/api': `http://localhost:${API_PORT}` },
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./tests/unit/setup.js'],
-    include: ['tests/**/*.test.{js,jsx}'],
+    include: ['tests/api/**/*.test.{js,jsx}', 'tests/unit/**/*.test.{js,jsx}'],
   },
 })

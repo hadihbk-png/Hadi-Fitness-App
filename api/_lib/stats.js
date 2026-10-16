@@ -27,5 +27,6 @@ export function longestStreak(dates) {
   return best
 }
 
-// value / goal as a whole percentage, safe for zero/missing values
-export const percent = (value, goal) => (goal > 0 && Number.isFinite(value) ? Math.round((value / goal) * 100) : 0)
+// value / goal as a whole percentage for progress rings: always 0–100, never NaN
+export const percent = (value, goal) =>
+  goal > 0 && Number.isFinite(value) ? Math.min(100, Math.max(0, Math.round((value / goal) * 100))) : 0

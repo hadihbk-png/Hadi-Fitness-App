@@ -1357,7 +1357,19 @@ ul, ol { list-style: none; margin: 0; padding: 0; }
 }
 .user-chip:hover { border-color: var(--border-strong); }
 .user-chip .avatar { width: 32px; height: 32px; font-size: 0.75rem; }
-.user-name { display: none; font-weight: 600; font-size: 0.9rem; padding-right: 10px; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* Name is visually hidden on phones (avatar only) but still read out by screen readers */
+.user-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; font-weight: 600; font-size: 0.9rem; padding-right: 10px; }
 
 .db-banner {
   position: fixed;
@@ -1458,7 +1470,7 @@ ul, ol { list-style: none; margin: 0; padding: 0; }
 
 @media (min-width: 640px) {
   .container { padding: 0 24px; }
-  .user-name { display: inline; }
+  .user-name { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
   .auth-card { padding: 36px 34px; }
   .workout-actions { flex-direction: row; }
   .workout-actions .btn-block { flex: 1; }

@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import request from 'supertest'
 import { useMemoryDb } from '../../server/memory-db.js'
 import { createApp } from '../../server/app.js'
-import { computeStreak, longestStreak } from '../../api/_lib/stats.js'
+import { computeStreak, longestStreak, percent } from '../../api/_lib/stats.js'
 import { addDays } from '../../api/_lib/dates.js'
 
 process.env.JWT_SECRET = 'test-secret-that-is-definitely-longer-than-32-chars'
@@ -16,6 +16,10 @@ beforeAll(async () => {
   app = await createApp()
 })
 afterAll(async () => {
+  // Clean up: remove every test user (their workouts, sets and bookings cascade)
+  await db.query(`DELETE FROM users WHERE email LIKE '%@pulsefit.com'`)
+  const [{ n }] = await db.query('SELECT count(*)::int AS n FROM users')
+  expect(n).toBe(0)
   delete globalThis.__pulsefitDb
   await db.close()
 })
@@ -236,5 +240,32 @@ describe('database unreachable', () => {
     } finally {
       globalThis.__pulsefitDb = real
     }
+  })
+})
+
+describe('progress rings', () => {
+  it('percent never goes above 100% and never returns NaN', () => {
+    expect(percent(5, 4)).toBe(100)
+    expect(percent(2, 4)).toBe(50)
+    expect(percent(-3, 4)).toBe(0)
+    expect(percent(NaN, 4)).toBe(0)
+    expect(percent(3, 0)).toBe(0)
+    expect(percent(undefined, 150)).toBe(0)
+  })
+
+  it('dashboard ring numbers stay within 0–100 when goals are beaten', async () => {
+    const agent = request.agent(app)
+    const me = (await signup(agent, 'rings@pulsefit.com', { weeklyGoalWorkouts: 1, weeklyGoalMinutes: 10 })).body.user
+    for (let i = 0; i < 3; i++) {
+      await db.query(
+        `INSERT INTO workouts (user_id, name, workout_date, status, duration_minutes, started_at, completed_at)
+         VALUES ($1, 'Big day', $2, 'completed', 45, now(), now())`,
+        [me.id, TODAY]
+      )
+    }
+    const { body } = await agent.get(`/api/dashboard?today=${TODAY}`)
+    expect(body.week).toMatchObject({ workouts: 3, minutes: 135, workoutsPct: 100, minutesPct: 100, goalsHit: 2, goalsTotal: 2 })
+    const numbers = JSON.stringify(body).match(/-?\d+(\.\d+)?|NaN|null/g)
+    expect(numbers).not.toContain('NaN')
   })
 })
