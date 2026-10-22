@@ -89,7 +89,7 @@ function TodayCard({ data, onStart }) {
           title={done ? 'Workout done today. Legend.' : 'No workout yet today.'}
           text={
             done
-              ? `You logged ${data.completedToday.minutes} active minutes today. Fancy more? Build another session in the Library.`
+              ? `You logged ${data.completedToday.minutes} active ${data.completedToday.minutes === 1 ? 'minute' : 'minutes'} today. Fancy more? Build another session in the Library.`
               : 'Pick one from the Library! Add a few exercises and they’ll show up here, ready to start.'
           }
           action={

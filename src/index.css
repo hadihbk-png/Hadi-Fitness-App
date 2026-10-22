@@ -1468,6 +1468,20 @@ ul, ol { list-style: none; margin: 0; padding: 0; }
 .diff-intermediate { color: var(--cyan); background: var(--cyan-soft); }
 .diff-advanced { color: #ff8fb4; background: rgba(255, 61, 129, 0.14); }
 
+/* Touch screens (bottom-nav sizes): every tap target at least 44px */
+@media (max-width: 899px) {
+  .icon-btn, .session-timer .icon-btn, .rest .icon-btn { width: 44px; height: 44px; }
+  .user-chip .avatar { width: 36px; height: 36px; }
+  .btn-sm, .filter-chip, .logo { min-height: 44px; }
+  .tabbar a { min-height: 44px; justify-content: center; }
+  .footer-grid a:not(.logo) { padding: 10px 0; }
+  .news-input input { align-self: stretch; }
+  .quote-dots { margin: -18px 0 -18px -18px; }
+  .quote-dots button { width: 44px; height: 44px; }
+  .quote-dots button::before { left: 18px; top: 18px; }
+  .quote-dots button.is-active { width: 62px; }
+}
+
 @media (min-width: 640px) {
   .container { padding: 0 24px; }
   .user-name { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
